@@ -8,6 +8,35 @@
 <!--Semantic UI-Development framework that helps create beautiful, responsive layouts using human-friendly HTML.-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+    <!-- Javascript code to set the minimum date for the datetime-local input field -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get the datetime-local input element
+            var scheduledTimeInput = document.querySelector("input[name='scheduled_time']");
+        
+            // Add an event listener to enforce the restriction
+            scheduledTimeInput.addEventListener("change", function () {
+                
+                // Get the current date and time
+                var today = new Date();
+                var now = today.toISOString().slice(0, 16);
+        
+                // Check if the selected date and time is earlier than the current date and time
+                if (scheduledTimeInput.value < now) {
+
+                    // Display an alert message to the user
+                    alert("Please select a valid date and time in the future.");
+        
+                    // Reset the input field to the current date and time
+                    scheduledTimeInput.value = now;
+                }  
+                    });
+             
+                }
+        );
+    </script>
+    
 </head>
 
 <body>
@@ -18,6 +47,7 @@
             <div class="field">
                 <label>Today's To dos...</label>
                 <input type="text" name="task" placeholder="Enter Todo..."><br>
+                <input type="datetime-local" name="scheduled_time"><br>
             </div>
             <button class="ui blue button" type="submit">Add</button>
         </form>
@@ -26,7 +56,7 @@
 <!--Jinja template engine syntax-->
         {% for todo in todo_list %}
         <div class="ui segment">
-            <p class="ui big header">{{todo.id }} | {{ todo.task }}</p>
+            <p class="ui big header">{{todo.id }} | {{ todo.task }} | {{todo.scheduled_time}}</p>
 
             {% if todo.complete == False %}
             <span class="ui gray label">Not Complete</span>

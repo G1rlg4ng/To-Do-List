@@ -1,20 +1,24 @@
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+#from flask_migrate import Migrate
 
 app = Flask(__name__)
 
 #///relative path, ////absolute path
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db' #Configures the database connection located in tasks.db
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #Disables modification tracking
+
 db = SQLAlchemy(app)
+#migrate = Migrate(app, db)
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task = db.Column(db.String(255), nullable=False)
     complete = db.Column(db.Boolean)
-    # emoji = db.Column(db.string(255))
-    # scheduled_time = db.Column(db.DateTime)
+    scheduled_time = db.Column(db.DateTime)
     # reminder_sent = db.Column(db.Boolean, default=False)
+    # emoji = db.Column(db.string(255))
     
 # A function to initialize the database within the application context
 def initialize_database():
@@ -30,9 +34,13 @@ def home():
 @app.route("/add", methods=["POST"])
 def add():
     task = request.form.get("task")
+    scheduled_time_str = request.form.get("scheduled_time") # Get scheduled time as string
     
-    if task:
-        new_todo = Task(task=task, complete = False)
+    if task and scheduled_time_str:
+        # Parse the scheduled_time string and convert it to a datetime object
+        scheduled_time = datetime.strptime(scheduled_time_str, "%Y-%m-%dT%H:%M")
+         
+        new_todo = Task(task=task, complete = False, scheduled_time=scheduled_time)
         db.session.add(new_todo)
         db.session.commit()
     return redirect(url_for("home"))
